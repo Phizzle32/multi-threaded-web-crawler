@@ -1,4 +1,6 @@
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -9,8 +11,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 public class WebCrawler implements Runnable {
-	private static final File file = new File("output.txt");
-
 	private ArrayDeque<String> linkQueue = new ArrayDeque<>();
 	private ArrayList<String> visited = new ArrayList<>();
 
@@ -20,13 +20,15 @@ public class WebCrawler implements Runnable {
 
 	@Override
 	public void run() {
-		while (!linkQueue.isEmpty()) {
+		while (!linkQueue.isEmpty() && !Thread.currentThread().isInterrupted()) {
 			String link = linkQueue.poll();
 			this.crawl(link);
 		}
 	}
 
 	private void crawl(String url) {
+		if (url.indexOf("http") != 0)
+			return;
 		Document webPage = request(url);
 		if (webPage == null)
 			return;
@@ -49,12 +51,26 @@ public class WebCrawler implements Runnable {
 				return null;
 
 			visited.add(url);
-			// Write to file here, beware of critical section
-			System.out.println(doc.title() + " - " + url); // This is just to see it working
+			write(doc.title() + " - " + url);
 			return doc;
 		} catch (IOException e) {
 			return null;
 		}
 	}
 
+	private static synchronized void write(String input) {
+		try {
+			File file = new File("output.txt");
+			if (!file.exists())
+				file.createNewFile();
+			if (file.canWrite()) {
+				BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+				bw.write(input);
+				bw.newLine();
+				bw.close();
+			}
+		} catch (IOException e) {
+			System.out.println("Cannot write to file");
+		}
+	}
 }
