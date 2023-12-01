@@ -24,7 +24,7 @@ public class Main {
 						last = curr;
 					}
 					br.close();
-					String lastUrl = last.substring(last.indexOf("http"), last.length());
+					String lastUrl = last.substring(last.lastIndexOf(" - ") + 3);
 					Thread thread = new Thread(new WebCrawler(lastUrl));
 					thread.start();
 					threads.add(thread);
@@ -33,7 +33,7 @@ public class Main {
 				} catch (IOException e) {
 					System.out.println("An error occured while reading from the file");
 				} catch (StringIndexOutOfBoundsException e) {
-					System.out.println("The last URL is invalid");
+					System.out.println("The last entry is invalid");
 				}
 			}
 		}
