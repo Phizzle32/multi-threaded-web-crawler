@@ -38,7 +38,6 @@ public class WebCrawler implements Runnable {
 			if (!visited.contains(link))
 				linkQueue.add(link);
 		}
-
 	}
 
 	private Document request(String url) {
@@ -53,7 +52,7 @@ public class WebCrawler implements Runnable {
 			visited.add(url);
 			write(doc.title() + " - " + url);
 			return doc;
-		} catch (IOException e) {
+		} catch (IOException | IllegalArgumentException e) {
 			return null;
 		}
 	}
