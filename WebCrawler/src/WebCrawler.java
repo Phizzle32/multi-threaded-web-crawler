@@ -28,7 +28,7 @@ public class WebCrawler implements Runnable {
 
 	private void crawl(String url) {
 		if (url.indexOf("http") != 0)
-			return;
+			url = "https://" + url;
 		Document webPage = request(url);
 		if (webPage == null)
 			return;
