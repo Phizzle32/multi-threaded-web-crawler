@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
+	public static String[] urls;
 	public static int getLines() throws FileNotFoundException{
 		int len = 0;
 		BufferedReader br = new BufferedReader(new FileReader("./output.txt"));
@@ -56,7 +57,7 @@ public class Main {
 		System.out.print("Enter website urls to crawl: ");
 		String websites = scanner.nextLine();
 
-		String[] urls = websites.trim().replaceAll(" +", " ").split(" ");
+		urls = websites.trim().replaceAll(" +", " ").split(" ");
 
 		try {
 			System.out.println("Type 'quit' at any time to stop.");
@@ -84,7 +85,7 @@ public class Main {
 			thread.interrupt();
 		});
 		try {
-			System.out.printf("Outputted %d lines to output.txt", getLines());
+			System.out.printf("Crawled and outputted %d lines to output.txt starting from %d URLs", getLines(), urls.length);
 		}
 		catch (FileNotFoundException e) {
 			System.out.println(e);
