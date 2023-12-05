@@ -7,6 +7,20 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
+	public static int getLines() throws FileNotFoundException{
+		int len = 0;
+		BufferedReader br = new BufferedReader(new FileReader("./output.txt"));
+		try {
+			while (br.readLine() != null) {
+				len++;
+			}
+		}
+		catch (IOException e) {
+			System.out.println(e);
+		}
+		
+		return len;
+	}
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		File file = new File("output.txt");
@@ -44,12 +58,20 @@ public class Main {
 
 		String[] urls = websites.trim().replaceAll(" +", " ").split(" ");
 
+		try {
+			System.out.println("Type 'quit' at any time to stop.");
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// this should never happen
+			System.out.println("Something really bad happened.");
+		}
 		// Creates a thread for each url
 		for (String url : urls) {
 			Thread thread = new Thread(new WebCrawler(url));
 			thread.start();
 			threads.add(thread);
 		}
+		System.out.println(String.format("Created %d threads. Beginning crawl...\n", threads.size()));
 
 		// Stops the program
 		String input = "";
@@ -61,5 +83,11 @@ public class Main {
 		threads.forEach(thread -> {
 			thread.interrupt();
 		});
+		try {
+			System.out.printf("Outputted %d lines to output.txt", getLines());
+		}
+		catch (FileNotFoundException e) {
+			System.out.println(e);
+		}
 	}
 }
