@@ -49,11 +49,9 @@ public class WebCrawler implements Runnable {
 			if (connect.response().statusCode() != 200)
 				return null;
 
-				visited.add(url);
-			if (doc.title() != "") {
-				// stop weird empty lines in output
-				write(doc.title() + " - " + url);
-			}
+			visited.add(url);
+			String title = doc.title() == "" ? "No title" : doc.title();
+			write(title + " - " + url);
 			return doc;
 		} catch (IOException | IllegalArgumentException e) {
 			return null;
@@ -70,7 +68,7 @@ public class WebCrawler implements Runnable {
 				bw.write(input);
 				bw.newLine();
 				bw.close();
-				// verify multithreading to user
+				// Verify multithreading to user
 				System.out.printf("%s \t %.10s \t Retrieved.\n", Thread.currentThread().getName(), input);
 			}
 		} catch (IOException e) {
