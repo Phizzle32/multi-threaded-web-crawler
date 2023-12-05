@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 public class Main {
 	public static String[] urls;
+
 	public static int getLines() throws FileNotFoundException{
 		int len = 0;
 		BufferedReader br = new BufferedReader(new FileReader("./output.txt"));
@@ -22,6 +23,7 @@ public class Main {
 		
 		return len;
 	}
+
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		File file = new File("output.txt");
@@ -83,6 +85,11 @@ public class Main {
 		scanner.close();
 		threads.forEach(thread -> {
 			thread.interrupt();
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				System.out.println("Something unexpected happened");
+			}
 		});
 		try {
 			System.out.printf("Crawled and outputted %d lines to output.txt starting from %d URLs", getLines(), urls.length);
