@@ -13,6 +13,7 @@ import org.jsoup.nodes.Element;
 public class WebCrawler implements Runnable {
 	private ArrayDeque<String> linkQueue = new ArrayDeque<>();
 	private ArrayList<String> visited = new ArrayList<>();
+	public static int numCrawled = 0;
 
 	public WebCrawler(String link) {
 		this.linkQueue.add(link);
@@ -68,7 +69,7 @@ public class WebCrawler implements Runnable {
 				bw.write(input);
 				bw.newLine();
 				bw.close();
-				// Verify multithreading to user
+				numCrawled++;
 				System.out.printf("%s \t %.10s \t Retrieved.\n", Thread.currentThread().getName(), input);
 			}
 		} catch (IOException e) {

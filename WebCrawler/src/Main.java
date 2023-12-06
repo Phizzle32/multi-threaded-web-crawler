@@ -7,29 +7,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-	public static String[] urls;
-
-	public static int getLines() throws FileNotFoundException{
-		int len = 0;
-		BufferedReader br = new BufferedReader(new FileReader("./output.txt"));
-		try {
-			while (br.readLine() != null) {
-				len++;
-			}
-		}
-		catch (IOException e) {
-			System.out.println(e);
-		}
-		
-		return len;
-	}
-
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		File file = new File("output.txt");
 		ArrayList<Thread> threads = new ArrayList<>();
+		Thread thread = null;
 
-		// Continues from last url
+		// Continues from last URL
 		if (file.exists() && file.length() > 0) {
 			System.out.println("Would you like to continue crawling from the last url (Y/N)? ");
 			if (scanner.nextLine().toLowerCase().contains("y")) {
@@ -42,8 +26,7 @@ public class Main {
 					}
 					br.close();
 					String lastUrl = last.substring(last.lastIndexOf(" - ") + 3);
-					Thread thread = new Thread(new WebCrawler(lastUrl));
-					thread.start();
+					thread = new Thread(new WebCrawler(lastUrl));
 					threads.add(thread);
 				} catch (FileNotFoundException e) {
 					System.out.println("File does not exist");
@@ -55,47 +38,49 @@ public class Main {
 			}
 		}
 
-		// Input urls to crawl from separated by white space
+		// Input URLs to crawl from separated by white space
 		System.out.print("Enter website urls to crawl: ");
 		String websites = scanner.nextLine();
+		String[] urls = websites.trim().replaceAll(" +", " ").split(" ");
 
-		urls = websites.trim().replaceAll(" +", " ").split(" ");
+		System.out.println("Type 'quit' at any time to stop.");
+		System.out.println(String.format("Created %d threads. Beginning crawl...\n", urls.length + threads.size()));
 
+		// Give user time to read instructions
 		try {
-			System.out.println("Type 'quit' at any time to stop.");
-			Thread.sleep(5000);
+			Thread.sleep(1500);
 		} catch (InterruptedException e) {
-			// this should never happen
 			System.out.println("Something really bad happened.");
 		}
-		// Creates a thread for each url
+
+		// Starts crawling from last URL if used
+		if (thread != null) {
+			thread.start();
+		}
+
+		// Creates a thread for each URL
 		for (String url : urls) {
-			Thread thread = new Thread(new WebCrawler(url));
+			thread = new Thread(new WebCrawler(url));
 			thread.start();
 			threads.add(thread);
 		}
-		System.out.println(String.format("Created %d threads. Beginning crawl...\n", threads.size()));
 
 		// Stops the program
 		String input = "";
 		while (!input.toLowerCase().contains("quit")) {
-			System.out.println("Type 'quit' to stop");
 			input = scanner.nextLine();
 		}
 		scanner.close();
-		threads.forEach(thread -> {
-			thread.interrupt();
+		threads.forEach(crawler -> {
+			crawler.interrupt();
 			try {
-				thread.join();
+				crawler.join();
 			} catch (InterruptedException e) {
 				System.out.println("Something unexpected happened");
 			}
 		});
-		try {
-			System.out.printf("Crawled and outputted %d lines to output.txt starting from %d URLs", getLines(), urls.length);
-		}
-		catch (FileNotFoundException e) {
-			System.out.println(e);
-		}
+
+		System.out.printf("Crawled and outputted %d lines to output.txt starting from %d URLs", WebCrawler.numCrawled,
+				threads.size());
 	}
 }
